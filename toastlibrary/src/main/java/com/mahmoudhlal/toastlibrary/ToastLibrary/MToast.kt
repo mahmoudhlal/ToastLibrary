@@ -1,4 +1,4 @@
-package com.mahmoudhlal.toastlibrary
+package com.mahmoudhlal.toastlibrary.ToastLibrary
 
 import android.content.Context
 import android.widget.Toast
