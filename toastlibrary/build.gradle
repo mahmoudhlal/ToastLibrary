@@ -1,0 +1,127 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion rootProject.COMPILE_SDK_VERSION
+    buildToolsVersion "29.0.3"
+    defaultConfig {
+        minSdkVersion rootProject.MIN_SDK_VERSION
+        targetSdkVersion rootProject.COMPILE_SDK_VERSION
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    excludes = ['**/*.kt']
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+group = 'com.mahmoudhlal.toastlibrary' // library package name
+version = '0.1.0'
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'Mahmoud Hlal'
+            description 'awesome toast maker'
+            url 'https://github.com/mahmoudhlal/ToastLibrary'
+            inceptionYear '2020'
+
+            packaging 'aar'
+            groupId 'com.mahmoudhlal.toastlibrary' //package name of your library
+            artifactId 'ToastLibrary' //Library name and must   be same as package name on bintray
+            version '0.1.0'
+
+            licenses {
+                license {
+                    name 'The MIT License (MIT)'
+                    url 'https://opensource.org/licenses/MIT'
+                }
+            }
+            scm {
+                connection 'https://github.com/mahmoudhlal/ToastLibrary.git'
+                url 'https://github.com/mahmoudhlal/ToastLibrary'
+
+            }
+            developers {
+                developer {
+                    id = 'mahmoudhlal741996' //bintray username
+                    name 'Mahmoud Hlal'
+                }
+            }
+        }
+    }
+}
+// Bintray
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+
+bintray {
+    // Fetch from local.properties file
+    // Please follow this step
+    /*
+     sdk.dir=/home/umesh/Android/Sdk
+     user=umeshbsa// bintray username
+     key=dd3e540bf673436cee35fc839607fe6252c117cc // Bintray profile key
+     // To find this key follow this step-
+      1. Go to Edit Profile and click on 'Api Key' from list
+      2. Fill your account password and show key, copy and paste on local.properties file.
+      Note- Please do not this.
+     user="umeshbsa"
+     key="dd3e540bf673436cee35fc839607fe6252c117cc" this is not accepted by bintray.
+     */
+    user = properties.getProperty('user')
+    key = properties.getProperty('key')
+    configurations = ['archives']
+    pkg {
+        repo = 'maven' // must be same as on bintray repo name
+        name = 'ToastLibrary' // must be same of library name as bintray
+        userOrg = 'mahmoudhlal741996' // this is username of bintray account
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/mahmoudhlal/ToastLibrary.git'
+        publish = true
+        version {
+            name = '0.1.0'
+            desc = 'This is updated version 0.1.0'
+            released = new Date()
+            vcsTag = 'v0.1.0'
+        }
+    }
+}
